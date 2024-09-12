@@ -1,3 +1,5 @@
+using ECC_API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECC_API
 {
@@ -8,8 +10,12 @@ namespace ECC_API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
+
+            // Configure Entity Framework Core
+            builder.Services.AddDbContext<ECCDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -26,7 +32,6 @@ namespace ECC_API
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
