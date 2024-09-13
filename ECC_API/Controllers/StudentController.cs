@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Logging;
 
 namespace ECC_API.Controllers
 {
@@ -12,10 +13,12 @@ namespace ECC_API.Controllers
     public class StudentController : ControllerBase
     {
         private readonly ECCDbContext _context;
+        private readonly ILogger<StudentController> _logger;
 
-        public StudentController(ECCDbContext context)
+        public StudentController(ECCDbContext context, ILogger<StudentController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // POST: api/Student/Register
@@ -35,6 +38,35 @@ namespace ECC_API.Controllers
             await _context.SaveChangesAsync();
 
             return Ok("Registration successful.");
+        }
+
+        [HttpPost("Login")]
+        public IActionResult Login([FromBody] LoginRequest loginRequest)
+        {
+            if (loginRequest == null || string.IsNullOrEmpty(loginRequest.Email) || string.IsNullOrEmpty(loginRequest.Password))
+            {
+                return BadRequest("Invalid login request.");
+            }
+
+            var student = _context.Students
+                .FirstOrDefault(s => s.Email == loginRequest.Email);
+
+            if (student == null)
+            {
+                return Unauthorized("Invalid email or password.");
+            }
+
+            // Log the email for debugging
+            _logger.LogInformation("Login attempt for email: {Email}", loginRequest.Email);
+
+            // Verify the password
+            if (!VerifyPassword(loginRequest.Password, student.Password))
+            {
+                return Unauthorized("Invalid email or password.");
+            }
+
+            // Return a success response if authentication is successful
+            return Ok("Login successful.");
         }
 
         // GET: api/Student/{email}
