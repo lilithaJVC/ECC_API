@@ -7,5 +7,7 @@ namespace ECC_API.Models
         public ECCDbContext(DbContextOptions<ECCDbContext> options) : base(options) { }
 
         public DbSet<Students> Students { get; set; }
+        public DbSet<FundingGuide> FundingGuide { get; set; }
+
     }
 }
