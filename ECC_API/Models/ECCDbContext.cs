@@ -8,6 +8,6 @@ namespace ECC_API.Models
 
         public DbSet<Students> Students { get; set; }
         public DbSet<FundingGuide> FundingGuide { get; set; }
-
+        public DbSet<BusinessProposal> BusinessProposal { get; set; }  
     }
 }
