@@ -39,24 +39,33 @@ namespace ECC_API.Controllers
             return fundingGuide;
         }
 
-        // POST: api/FundingGuideTemplate
         [HttpPost]
         public async Task<ActionResult> PostFundingGuide(FundingGuide fundingGuide)
         {
-            _context.FundingGuide.Add(fundingGuide);
-            await _context.SaveChangesAsync();
-
-            // Create a response object with the success message
-            var response = new
+            try
             {
-                Message = "Funding guide successfully captured.",
-                FundingGuideId = fundingGuide.FundingGuideId,
-                FundingPurpose = fundingGuide.FundingPurpose,
-                AmountRequested = fundingGuide.AmountRequested
-            };
+                // Remove the line that sets StudentNum
+                // fundingGuide.StudentNum = userStudentNum;
 
-            return CreatedAtAction(nameof(GetFundingGuide), new { id = fundingGuide.FundingGuideId }, response);
+                // Add the funding guide to the context
+                _context.FundingGuide.Add(fundingGuide);
+                await _context.SaveChangesAsync();
+
+                var response = new
+                {
+                    Message = "Funding guide successfully captured.",
+                    FundingGuideId = fundingGuide.FundingGuideId,
+                    FundingPurpose = fundingGuide.FundingPurpose,
+                    AmountRequested = fundingGuide.AmountRequested
+                };
+
+                return CreatedAtAction(nameof(GetFundingGuide), new { id = fundingGuide.FundingGuideId }, response);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                return StatusCode(500, new { message = "An error occurred while saving the funding guide.", error = ex.Message });
+            }
         }
-
     }
 }

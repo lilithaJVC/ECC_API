@@ -2,9 +2,10 @@
 {
     public class FundingGuide
     {
-        public FundingGuide(int fundingGuideId, string fundingPurpose, int amountRequested, string bussinessOverview, string bussinessName, string mission, string bussinessModel, string totalFunding, string useOfFunds, string expenses, string profitability, string industry, string competitors, string marketTrends, string keyMembersAndRoles, string keyMilestones, string timeline, string risks, string riskPlan, string summary, string name, string email, string phoneNumber)
+        public FundingGuide(int fundingGuideId, int studentNum, string fundingPurpose, int amountRequested, string bussinessOverview, string bussinessName, string mission, string bussinessModel, string totalFunding, string useOfFunds, string expenses, string profitability, string industry, string competitors, string marketTrends, string keyMembersAndRoles, string keyMilestones, string timeline, string risks, string riskPlan, string summary, string name, string email, string phoneNumber)
         {
             FundingGuideId = fundingGuideId;
+            StudentNum = studentNum;
             FundingPurpose = fundingPurpose;
             AmountRequested = amountRequested;
             BussinessOverview = bussinessOverview;
@@ -30,6 +31,8 @@
         }
 
         public int FundingGuideId { get; set; }
+
+        public int StudentNum { get; set; } // Add this line
         public string FundingPurpose { get; set; }
         public int AmountRequested { get; set; }
         public string BussinessOverview { get; set; }

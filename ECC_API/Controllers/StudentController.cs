@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 namespace ECC_API.Controllers
 {
@@ -41,19 +43,22 @@ namespace ECC_API.Controllers
         }
 
         [HttpPost("Login")]
-        public IActionResult Login([FromBody] LoginRequest loginRequest)
+        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
-            if (loginRequest == null || string.IsNullOrEmpty(loginRequest.Email) || string.IsNullOrEmpty(loginRequest.Password))
+            if (loginRequest == null || string.IsNullOrEmpty(loginRequest.Email) ||
+                string.IsNullOrEmpty(loginRequest.Password) ||
+                string.IsNullOrEmpty(loginRequest.Firstname))
             {
-                return BadRequest("Invalid login request.");
+                return BadRequest("Invalid login request. All fields are required.");
             }
 
             var student = _context.Students
-                .FirstOrDefault(s => s.Email == loginRequest.Email);
+                .FirstOrDefault(s => s.Email == loginRequest.Email &&
+                                     s.Firstname == loginRequest.Firstname);
 
             if (student == null)
             {
-                return Unauthorized("Invalid email or password.");
+                return Unauthorized("Invalid login credentials.");
             }
 
             // Log the email for debugging
@@ -62,8 +67,18 @@ namespace ECC_API.Controllers
             // Verify the password
             if (!VerifyPassword(loginRequest.Password, student.Password))
             {
-                return Unauthorized("Invalid email or password.");
+                return Unauthorized("Invalid login credentials.");
             }
+
+            // Create claims without StudentNum
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Email, student.Email),
+                // Add other claims as needed
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, "Login");
+            await HttpContext.SignInAsync(new ClaimsPrincipal(claimsIdentity));
 
             // Return a success response if authentication is successful
             return Ok("Login successful.");

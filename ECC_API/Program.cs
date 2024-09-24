@@ -16,6 +16,13 @@ namespace ECC_API
             builder.Services.AddDbContext<ECCDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // Configure Authentication
+            builder.Services.AddAuthentication("Cookies")
+                .AddCookie("Cookies", options =>
+                {
+                    options.LoginPath = "/api/Student/Login"; // Redirect to your login route
+                });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -29,11 +36,22 @@ namespace ECC_API
                 app.UseSwaggerUI();
             }
 
+
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+
             app.UseHttpsRedirection();
 
+            // Add authentication middleware
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
+
+            app.UseStaticFiles();
 
             app.Run();
         }
